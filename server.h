@@ -6,7 +6,7 @@
 /*   By: jalombar <jalombar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 11:12:07 by jalombar          #+#    #+#             */
-/*   Updated: 2024/07/02 16:13:33 by jalombar         ###   ########.fr       */
+/*   Updated: 2024/07/03 17:07:04 by jalombar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,5 +16,3 @@
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
-
-void	ft_strncat(char *dest, char *src, int size);
