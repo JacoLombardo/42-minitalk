@@ -6,7 +6,7 @@
 /*   By: jalombar <jalombar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 14:08:36 by jalombar          #+#    #+#             */
-/*   Updated: 2024/07/16 14:31:15 by jalombar         ###   ########.fr       */
+/*   Updated: 2024/07/16 14:50:31 by jalombar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,13 +38,7 @@ void	ft_handle_msg(pid_t pid_s, char *message)
 	i = 0;
 	while (message[i])
 		ft_send_sig(pid_s, message[i++]);
-	i = 0;
-	while (i < 8)
-	{
-		kill(pid_s, SIGUSR1);
-		usleep(42);
-		i++;
-	}
+	ft_send_sig(pid_s, '\0');
 }
 
 int	main(int argc, char **argv)
