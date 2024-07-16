@@ -6,7 +6,7 @@
 /*   By: jalombar <jalombar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 14:08:36 by jalombar          #+#    #+#             */
-/*   Updated: 2024/07/10 14:44:52 by jalombar         ###   ########.fr       */
+/*   Updated: 2024/07/16 14:31:15 by jalombar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	ft_send_sig(int pid, unsigned int c)
 			kill(pid, SIGUSR2);
 		else
 			kill(pid, SIGUSR1);
-		usleep(10);
+		usleep(42);
 	}
 }
 
@@ -42,7 +42,7 @@ void	ft_handle_msg(pid_t pid_s, char *message)
 	while (i < 8)
 	{
 		kill(pid_s, SIGUSR1);
-		usleep(10);
+		usleep(42);
 		i++;
 	}
 }
