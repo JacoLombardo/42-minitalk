@@ -6,45 +6,60 @@
 /*   By: jalombar <jalombar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 14:08:36 by jalombar          #+#    #+#             */
-/*   Updated: 2024/07/16 14:50:31 by jalombar         ###   ########.fr       */
+/*   Updated: 2024/07/23 17:40:28 by jalombar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft/libft.h"
 #include "minitalk.h"
 
+static int	g_received;
+
+void	sig_handler(int signum, siginfo_t *info, void *context)
+{
+	(void)context;
+	(void)info;
+	(void)signum;
+	g_received = 1;
+}
+
 void	ft_send_sig(int pid, unsigned int c)
 {
-	int				i;
-	unsigned int	temp;
+	int	i;
 
 	i = 8;
 	while (i > 0)
 	{
 		i--;
-		temp = c >> i;
-		if (temp % 2)
-			kill(pid, SIGUSR2);
-		else
+		if ((c >> i) & 1)
 			kill(pid, SIGUSR1);
-		usleep(42);
+		else
+			kill(pid, SIGUSR2);
+		while (!g_received)
+			pause();
+		g_received = 0;
 	}
-}
-
-void	ft_handle_msg(pid_t pid_s, char *message)
-{
-	int	i;
-
-	i = 0;
-	while (message[i])
-		ft_send_sig(pid_s, message[i++]);
-	ft_send_sig(pid_s, '\0');
 }
 
 int	main(int argc, char **argv)
 {
+	struct sigaction	sa;
+	int					pid;
+	int					i;
+
+	i = 0;
 	if (argc == 3)
-		ft_handle_msg(ft_atoi(argv[1]), argv[2]);
+	{
+		pid = ft_atoi(argv[1]);
+		sigemptyset(&sa.sa_mask);
+		sa.sa_flags = SA_RESTART | SA_SIGINFO;
+		sa.sa_sigaction = sig_handler;
+		sigaction(SIGUSR1, &sa, NULL);
+		sigaction(SIGUSR2, &sa, NULL);
+		while (argv[2][i])
+			ft_send_sig(pid, argv[2][i++]);
+		ft_send_sig(pid, '\0');
+	}
 	else if (argc == 2 || argc == 1)
 		ft_printf("Too few arguments\n");
 	else

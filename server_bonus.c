@@ -6,56 +6,49 @@
 /*   By: jalombar <jalombar@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/02 11:11:52 by jalombar          #+#    #+#             */
-/*   Updated: 2024/07/08 14:09:15 by jalombar         ###   ########.fr       */
+/*   Updated: 2024/07/23 17:27:55 by jalombar         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 #include "libft/libft.h"
 
-void	ft_extra_handle(int *binary, int *pid, int *i)
+void	sig_handler(int signum, siginfo_t *info, void *context)
 {
-	if (*binary == 0)
-	{
-		ft_printf("\n");
-		kill(*pid, SIGUSR1);
-		*pid = 0;
-	}
-	else
-		ft_printf("%c", *binary);
-	*binary = 0;
-	*i = 0;
-}
+	static char		binary;
+	static int		bits;
 
-void	ft_sig_handler(int signum)
-{
-	static int	binary;
-	static int	i;
-	static int	pid;
-
-	if (signum == SIGUSR2)
-		binary |= 1;
-	i++;
-	if (i == 32 && !pid)
-	{
-		pid = binary;
-		binary = 0;
-		i = 0;
-	}
-	else if (i == 8 && pid)
-		ft_extra_handle(&binary, &pid, &i);
-	else
+	(void)context;
+	if (signum == SIGUSR1)
+		binary = (binary << 1) | 1;
+	else if (signum == SIGUSR2)
 		binary <<= 1;
+	bits++;
+	if (bits == 8)
+	{
+		bits = 0;
+		if (!binary)
+		{
+			ft_printf("\n");
+			kill(info->si_pid, SIGUSR1);
+			return ;
+		}
+		ft_printf("%c", binary);
+		binary = 0;
+	}
+	kill(info->si_pid, SIGUSR2);
 }
 
 int	main(void)
 {
-	pid_t	pid;
+	struct sigaction	sa;
 
-	pid = getpid();
-	ft_printf("The process ID is %d\n", pid);
-	signal(SIGUSR1, ft_sig_handler);
-	signal(SIGUSR2, ft_sig_handler);
+	ft_printf("Server PID: %d\n", getpid());
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = SA_RESTART | SA_SIGINFO;
+	sa.sa_sigaction = sig_handler;
+	sigaction(SIGUSR1, &sa, NULL);
+	sigaction(SIGUSR2, &sa, NULL);
 	while (1)
 		pause();
 	return (0);
